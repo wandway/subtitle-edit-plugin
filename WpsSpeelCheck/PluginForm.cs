@@ -65,6 +65,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
             int i = 1;
             foreach(var p in _subtitle.Paragraphs)
             {
+                p.Text = p.Text.Replace(Environment.NewLine, " ");
                 AddSubtitleToSubtitleListView(p, i.ToString());
                 ++i;
             }
@@ -88,8 +89,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
             var endTime = p.EndTime.IsMaxTime ? "-" : p.EndTime.ToShortString();
             subItem = new ListViewItem.ListViewSubItem(item, endTime);
             item.SubItems.Add(subItem);
-
-            var text = p.Text.Replace(Environment.NewLine, Configuration.ListViewLineSeparatorString);
+            var text = p.Text;
             subItem = new ListViewItem.ListViewSubItem(item, text);
             item.SubItems.Add(subItem);
 
@@ -172,7 +172,9 @@ namespace Nikse.SubtitleEdit.PluginLogic
                 {
                     line += words[offset] + " ";
                 }
-                listViewSubtitle.Items[i].SubItems[3].Text = line.Trim();
+                line = line.Trim();
+                listViewSubtitle.Items[i].SubItems[3].Text = line;
+                p.Text = line;
                 if (i == listViewSubtitle.SelectedIndices[0])
                 {
                     richTextBoxParagraph.Text = line;
@@ -206,7 +208,9 @@ namespace Nikse.SubtitleEdit.PluginLogic
                 {
                     line += words[offset] + " ";
                 }
-                listViewSubtitle.Items[i].SubItems[3].Text = line.Trim();
+                line = line.Trim();
+                listViewSubtitle.Items[i].SubItems[3].Text = line;
+                p.Text = line;
                 if (i == listViewSubtitle.SelectedIndices[0])
                 {
                     richTextBoxParagraph.Text = line;
