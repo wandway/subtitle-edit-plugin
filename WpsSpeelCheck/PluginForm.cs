@@ -19,6 +19,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
         private Word.Application app;
         private Paragraph currentParagraph;
         private bool auth = false;
+        private string BreakMode = "count"; // count 计数方式，适用于语法检查 mark 标记方式，断句更准确
 
         public PluginForm(Subtitle sub, string name, string description)
         {
