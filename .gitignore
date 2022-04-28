@@ -1,0 +1,20 @@
+bin/
+obj/
+*.user
+*.suo
+token.txt
+
+# Visual Studio 2015/2017 cache/options directory
+.vs/
+*.ide
+
+# NuGet
+/src/.nuget/NuGet.exe
+/src/.nuget/NuGet.Config
+/src/packages/
+/packages/Microsoft.Toolkit.Forms.UI.Controls.WebView.5.0.1
+packages/
+
+
+# Rider
+*.idea
