@@ -12,7 +12,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
     {
         string IPlugin.Name => "WPS拼写检查";
         string IPlugin.Text => "WPS拼写检查";
-        decimal IPlugin.Version => 0.692M;
+        decimal IPlugin.Version => 0.699M;
         string IPlugin.Description => "调用WPS进行拼写检查，避免来回切换软件，提升工作效率。";
         string IPlugin.ActionType => "spellcheck";
         string IPlugin.Shortcut => String.Empty;

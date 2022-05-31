@@ -43,6 +43,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
             this.buttonSyncDoc = new System.Windows.Forms.Button();
             this.labelInfo = new System.Windows.Forms.Label();
             this.comboBoxBreak = new System.Windows.Forms.ComboBox();
+            this.labelBreakMode = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // buttonSubmit
@@ -169,17 +170,27 @@ namespace Nikse.SubtitleEdit.PluginLogic
             "空格计数",
             "断句标记",
             "批注标记"});
-            this.comboBoxBreak.Location = new System.Drawing.Point(364, 63);
+            this.comboBoxBreak.Location = new System.Drawing.Point(422, 62);
             this.comboBoxBreak.Name = "comboBoxBreak";
-            this.comboBoxBreak.Size = new System.Drawing.Size(121, 20);
+            this.comboBoxBreak.Size = new System.Drawing.Size(74, 20);
             this.comboBoxBreak.TabIndex = 9;
             this.comboBoxBreak.SelectedIndexChanged += new System.EventHandler(this.comboBoxBreak_SelectedIndexChanged);
+            // 
+            // labelBreakMode
+            // 
+            this.labelBreakMode.AutoSize = true;
+            this.labelBreakMode.Location = new System.Drawing.Point(364, 68);
+            this.labelBreakMode.Name = "labelBreakMode";
+            this.labelBreakMode.Size = new System.Drawing.Size(53, 12);
+            this.labelBreakMode.TabIndex = 10;
+            this.labelBreakMode.Text = "断句模式";
             // 
             // PluginForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 461);
+            this.Controls.Add(this.labelBreakMode);
             this.Controls.Add(this.comboBoxBreak);
             this.Controls.Add(this.labelInfo);
             this.Controls.Add(this.buttonSyncDoc);
@@ -218,5 +229,6 @@ namespace Nikse.SubtitleEdit.PluginLogic
         private System.Windows.Forms.Button buttonSyncDoc;
         private System.Windows.Forms.Label labelInfo;
         private System.Windows.Forms.ComboBox comboBoxBreak;
+        private System.Windows.Forms.Label labelBreakMode;
     }
 }

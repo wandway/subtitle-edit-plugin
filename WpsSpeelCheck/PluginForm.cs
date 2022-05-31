@@ -32,9 +32,14 @@ namespace Nikse.SubtitleEdit.PluginLogic
             labelStatus.Text = "字幕加载完成。";
         }
 
+        /// <summary>
+        /// 插件启动后初始化授权查询、授权后启动word
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void PluginForm_Load(object sender, EventArgs e)
         {
-            comboBoxBreak.SelectedIndex = 0;
+            comboBoxBreak.SelectedIndex = 1;
             CheckAuth();
             if (auth)
             {
@@ -46,6 +51,9 @@ namespace Nikse.SubtitleEdit.PluginLogic
             }
         }
 
+        /// <summary>
+        /// 检查授权
+        /// </summary>
         private void CheckAuth()
         {
             labelInfo.Text = "正在检查插件授权...";
@@ -63,6 +71,9 @@ namespace Nikse.SubtitleEdit.PluginLogic
             }
         }
 
+        /// <summary>
+        /// 填充字幕列表项
+        /// </summary>
         private void FillSubtitleListView()
         {
             listViewSubtitle.BeginUpdate();
@@ -82,6 +93,11 @@ namespace Nikse.SubtitleEdit.PluginLogic
             listViewSubtitle.EndUpdate();
         }
 
+        /// <summary>
+        /// 初始化字幕列表
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="index"></param>
         private void AddSubtitleToSubtitleListView(Paragraph p, string index)
         {
             var item = new ListViewItem(index) { Tag = p};
@@ -100,6 +116,11 @@ namespace Nikse.SubtitleEdit.PluginLogic
             listViewSubtitle.Items.Add(item);
         }
 
+        /// <summary>
+        /// 切换当前字幕
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void listViewSubtitle_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (listViewSubtitle.Items.Count < 1)
@@ -116,6 +137,11 @@ namespace Nikse.SubtitleEdit.PluginLogic
             richTextBoxParagraph.Text = p.Text;
         }
 
+        /// <summary>
+        /// 单句拼写检查
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void buttonCheckParagraph_Click(object sender, EventArgs e)
         {
             if (!auth)
@@ -137,11 +163,16 @@ namespace Nikse.SubtitleEdit.PluginLogic
         {
             if (auth)
             {                
-                app.ActiveDocument.Close(false);
-                app.Quit(false);
+                //app.ActiveDocument.Close(false);
+                //app.Quit(false);
             }
         }
 
+        /// <summary>
+        /// 点击全文检查按钮
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void buttonFullTextCheck_Click(object sender, EventArgs e)
         {
 
@@ -162,43 +193,27 @@ namespace Nikse.SubtitleEdit.PluginLogic
                 CheckWithSplit();
                 return;
             }
+
+            CheckWithBlankCount();
+        }
+
+        /// <summary>
+        /// 使用空格计数进行拼写检查
+        /// </summary>
+        private void CheckWithBlankCount()
+        {
             var doc = app.ActiveDocument;
-            var lines = new List<String>();
-            var pos = 0;
-            var offsets = new List<int>();
-            foreach (var p in _subtitle.Paragraphs)
-            {
-                offsets.Add(pos);
-                lines.Add(p.Text);
-                pos += p.Text.Split(' ').Count();
-            }
-            doc.Content.Text = string.Join(" ", lines);
+            doc.Range().Text = string.Join(" ", _subtitle.Paragraphs.Select(e => e.Text).ToList<String>());
 
             MessageBox.Show("Word已经运行，请切换到Word完成拼写检查");
             doc.CheckSpelling();
             doc.CheckGrammar();
-            var words = doc.Range().Text.Split(' ');
-
-            for (int i = 0; i < _subtitle.Paragraphs.Count; i++)
-            {
-                var p = _subtitle.Paragraphs[i];
-                var wordCount = p.Text.Split(' ').Count();
-                int end = wordCount + offsets[i];
-                var line = "";
-                for (int offset = offsets[i]; offset < end; offset ++)
-                {
-                    line += words[offset] + " ";
-                }
-                line = line.Trim();
-                listViewSubtitle.Items[i].SubItems[3].Text = line;
-                p.Text = line;
-                if (i == listViewSubtitle.SelectedIndices[0])
-                {
-                    richTextBoxParagraph.Text = line;
-                }
-            }
+            BlankCountSync();
         }
 
+        /// <summary>
+        /// 使用批注进行语法、拼写检查
+        /// </summary>
         private void CheckWithComments()
         {
             MessageBox.Show("当前使用批注断句模式，该模式运行较为缓慢，在弹出【请开始检查】的提示框前，请不要操作，现在请点击确定", "开始在word中标记断句");
@@ -210,30 +225,37 @@ namespace Nikse.SubtitleEdit.PluginLogic
             foreach (var p in _subtitle.Paragraphs)
             {
                 end = start + p.Text.Length + 1;
+                start = end - 1;
                 range = doc.Range(start, end);
-                //range.Text = p.Text;
-                range.Comments.Add(range, string.Format("段落{0}", p.Number));
+                range.Comments.Add(range, string.Format("{0}", p.Number));
                 start = end + 1;
-                labelStatus.Text = string.Format("正在标记第{0}句唱词，请耐心等待", p.Number);
+                labelStatus.Text = string.Format("正在标记第{0}/{1}句唱词，请耐心等待", p.Number, _subtitle.Paragraphs.Count);
             }
+            labelStatus.Text = "标记完成，请不要破坏断句批注！！！";
             MessageBox.Show("Word已经运行，请在Word内完成拼写检查，注意不要破坏批注范围", "请开始检查");
             doc.CheckSpelling();
             doc.CheckGrammar();
             CommentsSync();
         }
 
+        /// <summary>
+        /// 使用分割符进行语法、拼写检查
+        /// </summary>
         private void CheckWithSplit()
         {
             var doc = app.ActiveDocument;
-            //var c = "\0";
-            //var c = "¶ ";
-            var c = " ";
+            var c = "\0";
             doc.Range().Text = string.Join(c, _subtitle.Paragraphs.Select(e => e.Text).ToList<String>());
             doc.CheckSpelling();
             doc.CheckGrammar();
             SplitSync();
         }
 
+        /// <summary>
+        /// 点击全文同步按钮
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void buttonSyncDoc_Click(object sender, EventArgs e)
         {
             if (!auth)
@@ -251,6 +273,15 @@ namespace Nikse.SubtitleEdit.PluginLogic
                 SplitSync();
                 return;
             }
+            BlankCountSync();
+        }
+
+        /// <summary>
+        /// 空格计数模式同步
+        /// </summary>
+        private void BlankCountSync()
+        {
+            labelStatus.Text = "正在同步中……标记模式同步会需要较长时间！！！";
             var pos = 0;
             var offsets = new List<int>();
             foreach (var p in _subtitle.Paragraphs)
@@ -260,17 +291,19 @@ namespace Nikse.SubtitleEdit.PluginLogic
             }
             var doc = app.ActiveDocument;
             var words = doc.Range().Text.Split(' ');
-            if (words.Length != _subtitle.Paragraphs.Count)
-            {
-                MessageBox.Show(string.Format("word唱词行数不一致, 字幕{0}行，word文档{1}行，请核对当前word文档内容是否为对应字幕内容", _subtitle.Paragraphs.Count, words.Length));
-                return;
-            }
 
             for (int i = 0; i < _subtitle.Paragraphs.Count; i++)
             {
+                labelStatus.Text = string.Format("正在同步第{0}/{1}句字幕...", i + 1, _subtitle.Paragraphs.Count);
                 var p = _subtitle.Paragraphs[i];
                 var wordCount = p.Text.Split(' ').Count();
                 int end = wordCount + offsets[i];
+                if (end > words.Length)
+                {
+                    labelStatus.Text = "同步失败!!!";
+                    MessageBox.Show("当前处于空格计数模式，本模式不支持增删单词，无法完成唱词同步");
+                    return;
+                }
                 var line = "";
                 for (int offset = offsets[i]; offset < end; offset++)
                 {
@@ -284,9 +317,13 @@ namespace Nikse.SubtitleEdit.PluginLogic
                     richTextBoxParagraph.Text = line;
                 }
             }
+            labelStatus.Text = "同步完成";
             MessageBox.Show("同步完成");
         }
 
+        /// <summary>
+        /// 通过批注识别唱词行数
+        /// </summary>
         private void CommentsSync()
         {
             var doc = app.ActiveDocument;
@@ -313,6 +350,9 @@ namespace Nikse.SubtitleEdit.PluginLogic
             MessageBox.Show("同步完成");
         }
 
+        /// <summary>
+        /// 通过分割符识别唱词行数
+        /// </summary>
         private void SplitSync()
         {
             var doc = app.ActiveDocument;
@@ -351,13 +391,16 @@ namespace Nikse.SubtitleEdit.PluginLogic
             switch(comboBoxBreak.SelectedIndex)
             {
                 case 0:
+                    labelInfo.Text = "完整的语法检查，速度快，但是不支持在word中增删单词";
                     BreakMode = "count";
                     break;
                 case 1:
-                    BreakMode = "mark";
+                    labelInfo.Text = "支持增删单词，速度快，断句点语法检查不完整";
+                    BreakMode = "split";
                     break;
                 default:
-                    BreakMode = "split";
+                    labelInfo.Text = "【不推荐】支持在word中增删单词，速度慢,不完整的语法检查";
+                    BreakMode = "mark";
                     break;
             }
         }
