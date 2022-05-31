@@ -19,7 +19,10 @@ namespace Nikse.SubtitleEdit.PluginLogic
         private Word.Application app;
         private Paragraph currentParagraph;
         private bool auth = false;
-        private string BreakMode = "count"; // count 计数方式，适用于语法检查 mark 标记方式，断句更准确
+        // count 记数方式，适用于语法检查
+        // split 分隔符方式，速度快，准确性高，但会影响拼写语法的结果
+        // mark 标记方式，断句更准确，不影响语法检查，但是效率低
+        private string BreakMode = "split"; 
 
         public PluginForm(Subtitle sub, string name, string description)
         {
@@ -31,6 +34,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
 
         private void PluginForm_Load(object sender, EventArgs e)
         {
+            comboBoxBreak.SelectedIndex = 0;
             CheckAuth();
             if (auth)
             {
@@ -132,7 +136,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
         ~PluginForm()
         {
             if (auth)
-            {
+            {                
                 app.ActiveDocument.Close(false);
                 app.Quit(false);
             }
@@ -140,9 +144,22 @@ namespace Nikse.SubtitleEdit.PluginLogic
 
         private void buttonFullTextCheck_Click(object sender, EventArgs e)
         {
+
             if (!auth)
             {
                 labelStatus.Text = "未能获得授权";
+                return;
+            }
+
+            if (BreakMode == "mark")
+            {
+                CheckWithComments();
+                return;
+            }
+
+            if (BreakMode == "split")
+            {
+                CheckWithSplit();
                 return;
             }
             var doc = app.ActiveDocument;
@@ -182,11 +199,56 @@ namespace Nikse.SubtitleEdit.PluginLogic
             }
         }
 
+        private void CheckWithComments()
+        {
+            MessageBox.Show("当前使用批注断句模式，该模式运行较为缓慢，在弹出【请开始检查】的提示框前，请不要操作，现在请点击确定", "开始在word中标记断句");
+            var doc = app.ActiveDocument;
+            doc.Range().Text = string.Join(" ", _subtitle.Paragraphs.Select(e => e.Text).ToList<String>());
+            var start = 0;
+            int end;
+            Range range;
+            foreach (var p in _subtitle.Paragraphs)
+            {
+                end = start + p.Text.Length + 1;
+                range = doc.Range(start, end);
+                //range.Text = p.Text;
+                range.Comments.Add(range, string.Format("段落{0}", p.Number));
+                start = end + 1;
+                labelStatus.Text = string.Format("正在标记第{0}句唱词，请耐心等待", p.Number);
+            }
+            MessageBox.Show("Word已经运行，请在Word内完成拼写检查，注意不要破坏批注范围", "请开始检查");
+            doc.CheckSpelling();
+            doc.CheckGrammar();
+            CommentsSync();
+        }
+
+        private void CheckWithSplit()
+        {
+            var doc = app.ActiveDocument;
+            //var c = "\0";
+            //var c = "¶ ";
+            var c = " ";
+            doc.Range().Text = string.Join(c, _subtitle.Paragraphs.Select(e => e.Text).ToList<String>());
+            doc.CheckSpelling();
+            doc.CheckGrammar();
+            SplitSync();
+        }
+
         private void buttonSyncDoc_Click(object sender, EventArgs e)
         {
             if (!auth)
             {
                 labelStatus.Text = "未能获得授权";
+                return;
+            }
+            if (BreakMode == "mark")
+            {
+                CommentsSync();
+                return;
+            }
+            if (BreakMode == "split")
+            {
+                SplitSync();
                 return;
             }
             var pos = 0;
@@ -198,6 +260,12 @@ namespace Nikse.SubtitleEdit.PluginLogic
             }
             var doc = app.ActiveDocument;
             var words = doc.Range().Text.Split(' ');
+            if (words.Length != _subtitle.Paragraphs.Count)
+            {
+                MessageBox.Show(string.Format("word唱词行数不一致, 字幕{0}行，word文档{1}行，请核对当前word文档内容是否为对应字幕内容", _subtitle.Paragraphs.Count, words.Length));
+                return;
+            }
+
             for (int i = 0; i < _subtitle.Paragraphs.Count; i++)
             {
                 var p = _subtitle.Paragraphs[i];
@@ -216,6 +284,56 @@ namespace Nikse.SubtitleEdit.PluginLogic
                     richTextBoxParagraph.Text = line;
                 }
             }
+            MessageBox.Show("同步完成");
+        }
+
+        private void CommentsSync()
+        {
+            var doc = app.ActiveDocument;
+            if (doc.Comments.Count != _subtitle.Paragraphs.Count)
+            {
+                MessageBox.Show("word唱词行数不一致，请核对当前word文档内容是否为对应字幕内容");
+                return;
+            }
+            var start = 0;
+            int end;
+            Range range;
+            for (int i = 0; i < _subtitle.Paragraphs.Count; i++)
+            {
+                end = doc.Comments[i + 1].Reference.Start;
+                range = doc.Range(start, end);
+                _subtitle.Paragraphs[i].Text = range.Text;
+                listViewSubtitle.Items[i].SubItems[3].Text = range.Text;
+                if (i == listViewSubtitle.SelectedIndices[0])
+                {
+                    richTextBoxParagraph.Text = range.Text;
+                }
+                start = end;
+            }
+            MessageBox.Show("同步完成");
+        }
+
+        private void SplitSync()
+        {
+            var doc = app.ActiveDocument;
+            var c = '\0';
+            var words = doc.Range().Text.Split(c);
+            if (words.Length != _subtitle.Paragraphs.Count)
+            {
+                MessageBox.Show("word唱词行数不一致，请核对当前word文档内容是否为对应字幕内容");
+                return;
+            }
+            
+            for (int i = 0; i < words.Length; i++)
+            {
+                _subtitle.Paragraphs[i].Text = words[i];
+                listViewSubtitle.Items[i].SubItems[3].Text = words[i];
+                if (i == listViewSubtitle.SelectedIndices[0])
+                {
+                    richTextBoxParagraph.Text = words[i];
+                }
+            }
+            MessageBox.Show("同步完成");
         }
 
         private void buttonSubmit_Click(object sender, EventArgs e)
@@ -226,6 +344,22 @@ namespace Nikse.SubtitleEdit.PluginLogic
                 app.Quit(false);
             }
             DialogResult = DialogResult.OK;
+        }
+
+        private void comboBoxBreak_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch(comboBoxBreak.SelectedIndex)
+            {
+                case 0:
+                    BreakMode = "count";
+                    break;
+                case 1:
+                    BreakMode = "mark";
+                    break;
+                default:
+                    BreakMode = "split";
+                    break;
+            }
         }
     }
 }

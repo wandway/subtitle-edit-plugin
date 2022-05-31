@@ -126,6 +126,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestWordSpellCheck", "TestW
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WpfSpellCheck", "WpfSpellCheck\WpfSpellCheck.csproj", "{56A86D32-298B-43A5-9B02-FBE067212358}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordMarkSection", "WordMarkSection\WordMarkSection.csproj", "{8DE8CD46-C152-48E2-AB81-A0664F5CEA38}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Plugin-Shared\Plugin-Shared.projitems*{143a1481-b4ee-4aa3-8e5e-af1712477f57}*SharedItemsImports = 4
@@ -775,6 +777,18 @@ Global
 		{56A86D32-298B-43A5-9B02-FBE067212358}.Release|x64.Build.0 = Release|Any CPU
 		{56A86D32-298B-43A5-9B02-FBE067212358}.Release|x86.ActiveCfg = Release|Any CPU
 		{56A86D32-298B-43A5-9B02-FBE067212358}.Release|x86.Build.0 = Release|Any CPU
+		{8DE8CD46-C152-48E2-AB81-A0664F5CEA38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DE8CD46-C152-48E2-AB81-A0664F5CEA38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8DE8CD46-C152-48E2-AB81-A0664F5CEA38}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8DE8CD46-C152-48E2-AB81-A0664F5CEA38}.Debug|x64.Build.0 = Debug|Any CPU
+		{8DE8CD46-C152-48E2-AB81-A0664F5CEA38}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8DE8CD46-C152-48E2-AB81-A0664F5CEA38}.Debug|x86.Build.0 = Debug|Any CPU
+		{8DE8CD46-C152-48E2-AB81-A0664F5CEA38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8DE8CD46-C152-48E2-AB81-A0664F5CEA38}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8DE8CD46-C152-48E2-AB81-A0664F5CEA38}.Release|x64.ActiveCfg = Release|Any CPU
+		{8DE8CD46-C152-48E2-AB81-A0664F5CEA38}.Release|x64.Build.0 = Release|Any CPU
+		{8DE8CD46-C152-48E2-AB81-A0664F5CEA38}.Release|x86.ActiveCfg = Release|Any CPU
+		{8DE8CD46-C152-48E2-AB81-A0664F5CEA38}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -832,6 +846,7 @@ Global
 		{5418EF53-E8D1-4736-967B-84693927A7C2} = {35C336CD-7927-40CB-A3AD-940719D4CD62}
 		{07246718-CC00-444D-9784-AF507D191F02} = {35C336CD-7927-40CB-A3AD-940719D4CD62}
 		{56A86D32-298B-43A5-9B02-FBE067212358} = {35C336CD-7927-40CB-A3AD-940719D4CD62}
+		{8DE8CD46-C152-48E2-AB81-A0664F5CEA38} = {35C336CD-7927-40CB-A3AD-940719D4CD62}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8BBF401C-6D00-4F22-BFC0-DE2673213D5B}

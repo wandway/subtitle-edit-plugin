@@ -11,8 +11,8 @@ namespace Nikse.SubtitleEdit.PluginLogic
     class WpsSpellCheck : IPlugin
     {
         string IPlugin.Name => "WPS拼写检查";
-        string IPlugin.Text => "WPS拼写检查 v0.4";
-        decimal IPlugin.Version => 0.4M;
+        string IPlugin.Text => "WPS拼写检查";
+        decimal IPlugin.Version => 0.692M;
         string IPlugin.Description => "调用WPS进行拼写检查，避免来回切换软件，提升工作效率。";
         string IPlugin.ActionType => "spellcheck";
         string IPlugin.Shortcut => String.Empty;

@@ -42,6 +42,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
             this.labelStatus = new System.Windows.Forms.Label();
             this.buttonSyncDoc = new System.Windows.Forms.Button();
             this.labelInfo = new System.Windows.Forms.Label();
+            this.comboBoxBreak = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // buttonSubmit
@@ -161,11 +162,25 @@ namespace Nikse.SubtitleEdit.PluginLogic
             this.labelInfo.TabIndex = 8;
             this.labelInfo.Text = "欢迎使用wps spell check插件";
             // 
+            // comboBoxBreak
+            // 
+            this.comboBoxBreak.FormattingEnabled = true;
+            this.comboBoxBreak.Items.AddRange(new object[] {
+            "空格计数",
+            "断句标记",
+            "批注标记"});
+            this.comboBoxBreak.Location = new System.Drawing.Point(364, 63);
+            this.comboBoxBreak.Name = "comboBoxBreak";
+            this.comboBoxBreak.Size = new System.Drawing.Size(121, 20);
+            this.comboBoxBreak.TabIndex = 9;
+            this.comboBoxBreak.SelectedIndexChanged += new System.EventHandler(this.comboBoxBreak_SelectedIndexChanged);
+            // 
             // PluginForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 461);
+            this.Controls.Add(this.comboBoxBreak);
             this.Controls.Add(this.labelInfo);
             this.Controls.Add(this.buttonSyncDoc);
             this.Controls.Add(this.labelStatus);
@@ -202,5 +217,6 @@ namespace Nikse.SubtitleEdit.PluginLogic
         private System.Windows.Forms.ColumnHeader columnIndex;
         private System.Windows.Forms.Button buttonSyncDoc;
         private System.Windows.Forms.Label labelInfo;
+        private System.Windows.Forms.ComboBox comboBoxBreak;
     }
 }
